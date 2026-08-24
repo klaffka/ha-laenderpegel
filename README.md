@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" width="480" alt="Länderpegel — Wasserpegel für Home Assistant"/>
+</p>
+
 # Länderpegel for Home Assistant
 
 A custom Home Assistant integration for **German state river gauge (Wasserpegel) data**. It covers the
@@ -38,6 +42,11 @@ The second integration in this repository, `pegelonline`, covers the **federal w
 (Rhein, Elbe, Main, Donau, Weser, …) via the public PEGELONLINE v2 REST API of the German waterway
 administrations (WSV).
 
+> **Note:** recent Home Assistant versions ship a core `pegel_online` integration that searches
+> for gauges near a map location. This `pegelonline` integration selects a waterway directly
+> (e.g. Elbe, Rhein) and lists all of its gauges — no map location needed. In the *Add
+> Integration* dialog it is listed as **PEGELONLINE (WSV)**.
+
 Each station creates:
 
 - `sensor.<station>_wasserstand` – current water level with unit, timestamp, 24 h min/max and,
@@ -71,6 +80,9 @@ Each station creates:
   if known – the gauge zero point (Pegelnullpunkt)
 - `binary_sensor.<station>_warnstufe` – active flood alert level (only for Brandenburg, Hamburg,
   Sachsen and Thüringen)
+
+If a selected gauge has no data at all (e.g. it has been decommissioned), the setup is aborted
+with a clear message instead of creating an entry that would fail to load.
 
 ## Polling
 
