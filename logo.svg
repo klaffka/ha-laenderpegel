@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 256">
+  <svg x="48" y="48" width="160" height="160" viewBox="0 0 452 452">
+    <rect width="452" height="452" rx="98" fill="#03A9F4"/>
+    <path d="M60 235 q56.5 -68 113 0 t113 0 t113 0" stroke="#fff" stroke-width="32" fill="none" stroke-linecap="round"/>
+    <path d="M60 320 q56.5 -68 113 0 t113 0 t113 0" stroke="#fff" stroke-width="32" fill="none" stroke-linecap="round" opacity="0.55"/>
+  </svg>
+  <text x="240" y="136" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="68" font-weight="700" fill="#0F3A54">L&#228;nderpegel</text>
+  <text x="242" y="182" font-family="Inter, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="27" font-weight="500" fill="#4C6E85">Wasserpegel f&#252;r Home Assistant</text>
+</svg>
