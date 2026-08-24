@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Länderpegel",
+        "description": "Select a German state (Bundesland).",
+        "data": {
+          "bundesland": "State"
+        }
+      },
+      "wasser": {
+        "title": "Länderpegel – {bundesland}",
+        "description": "Select a waterway.",
+        "data": {
+          "wasser": "Waterway"
+        }
+      },
+      "station": {
+        "title": "Länderpegel – {bundesland}",
+        "description": "Select a gauge station on the {wasser}.",
+        "data": {
+          "station": "Gauge station"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "The state gauge portal could not be reached.",
+      "no_stations": "The state gauge portal returned no stations."
+    },
+    "abort": {
+      "already_configured": "This gauge station is already configured."
+    }
+  }
+}

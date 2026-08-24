@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "PEGELONLINE (WSV)",
+        "description": "Select a waterway from the German federal waterway network.",
+        "data": {
+          "wasser": "Waterway"
+        }
+      },
+      "station": {
+        "title": "PEGELONLINE (WSV)",
+        "description": "Select a gauge station on the {wasser}.",
+        "data": {
+          "station": "Gauge station"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "The PEGELONLINE API could not be reached."
+    },
+    "abort": {
+      "already_configured": "This gauge station is already configured.",
+      "cannot_connect": "The PEGELONLINE API could not be reached."
+    }
+  }
+}

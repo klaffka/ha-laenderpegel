@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "PEGELONLINE (WSV)",
+        "description": "Wähle ein Gewässer aus dem Bundeswasserstraßennetz.",
+        "data": {
+          "wasser": "Gewässer"
+        }
+      },
+      "station": {
+        "title": "PEGELONLINE (WSV)",
+        "description": "Wähle eine Messstelle am {wasser}.",
+        "data": {
+          "station": "Messstelle"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Die PEGELONLINE-API ist nicht erreichbar."
+    },
+    "abort": {
+      "already_configured": "Diese Messstelle ist bereits konfiguriert.",
+      "cannot_connect": "Die PEGELONLINE-API ist nicht erreichbar."
+    }
+  }
+}

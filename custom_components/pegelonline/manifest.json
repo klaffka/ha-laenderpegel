@@ -1,0 +1,10 @@
+{
+  "domain": "pegelonline",
+  "name": "PEGELONLINE (WSV)",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://www.pegelonline.wsv.de/webservice/guideRestapi",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "version": "1.0.0"
+}

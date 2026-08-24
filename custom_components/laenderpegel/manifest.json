@@ -1,0 +1,10 @@
+{
+  "domain": "laenderpegel",
+  "name": "Länderpegel",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://www.hochwasserzentralen.de",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "version": "1.0.0"
+}

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Länderpegel",
+        "description": "Wähle ein Bundesland.",
+        "data": {
+          "bundesland": "Bundesland"
+        }
+      },
+      "wasser": {
+        "title": "Länderpegel – {bundesland}",
+        "description": "Wähle ein Gewässer.",
+        "data": {
+          "wasser": "Gewässer"
+        }
+      },
+      "station": {
+        "title": "Länderpegel – {bundesland}",
+        "description": "Wähle eine Messstelle am {wasser}.",
+        "data": {
+          "station": "Messstelle"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Das Landes-Pegelportal ist nicht erreichbar.",
+      "no_stations": "Das Landes-Pegelportal lieferte keine Stationen."
+    },
+    "abort": {
+      "already_configured": "Diese Messstelle ist bereits konfiguriert."
+    }
+  }
+}
