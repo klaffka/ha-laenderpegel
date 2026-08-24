@@ -22,7 +22,7 @@ jobs:
           pip install pytest-homeassistant-custom-component ruff
 
       - name: Ruff
-        run: ruff check custom_components/
+        run: ruff check custom_components/ scripts/
 
       - name: Tests
         run: python -m pytest test_*.py -q

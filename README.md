@@ -5,8 +5,8 @@ operational gauge networks of 14 German states with live water levels, measureme
 (provider-dependent, 1 day to 30 days), 24 h min/max and – where the portal provides it – the
 current flood alert level (Warnstufe).
 
-The federal waterway gauges (WSV PEGELONLINE) are a separate network and are covered by the
-companion integration `pegelonline`.
+This repository also contains the companion integration **PEGELONLINE (WSV)** for the federal
+waterway gauges, see below.
 
 ## Supported states
 
@@ -31,6 +31,21 @@ Not available:
 
 - **Bremen** – no own state gauge network
 - **Berlin** – `wasserportal.berlin.de` is currently in maintenance; can be added once it is back
+
+## PEGELONLINE (WSV)
+
+The second integration in this repository, `pegelonline`, covers the **federal waterway gauges**
+(Rhein, Elbe, Main, Donau, Weser, …) via the public PEGELONLINE v2 REST API of the German waterway
+administrations (WSV).
+
+Each station creates:
+
+- `sensor.<station>_wasserstand` – current water level with unit, timestamp, 24 h min/max and,
+  if published, the gauge zero point
+- `sensor.<station>_vorhersage` – forecast value (optional, enabled in the setup form)
+
+Configuration: *Settings → Devices & Services → Add Integration* → **PEGELONLINE**, then search
+for the station by name or number.
 
 ## Installation
 

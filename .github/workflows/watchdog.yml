@@ -1,0 +1,56 @@
+name: Watchdog
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aiohttp
+
+      - name: Check providers
+        id: check
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python -m scripts.watchdog | tee watchdog-report.md
+
+      - name: Open issue on failure
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          OPEN=$(gh issue list --label watchdog --state open --json number --jq '.[0].number // empty')
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --body-file watchdog-report.md
+          else
+            gh issue create --title "[watchdog] laenderpegel provider check failed" \
+              --label watchdog --body-file watchdog-report.md
+          fi
+
+      - name: Close issue on recovery
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          OPEN=$(gh issue list --label watchdog --state open --json number --jq '.[0].number // empty')
+          if [ -n "$OPEN" ]; then
+            gh issue comment "$OPEN" --body "All providers are healthy again."
+            gh issue close "$OPEN"
+          fi

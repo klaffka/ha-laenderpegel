@@ -1,7 +1,9 @@
 {
   "domain": "pegelonline",
   "name": "PEGELONLINE (WSV)",
-  "codeowners": [],
+  "codeowners": [
+    "@klaffka"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/klaffka/ha-laenderpegel",
   "integration_type": "hub",
