@@ -3,8 +3,9 @@
   "name": "PEGELONLINE (WSV)",
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://www.pegelonline.wsv.de/webservice/guideRestapi",
+  "documentation": "https://github.com/klaffka/ha-laenderpegel",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/klaffka/ha-laenderpegel/issues",
   "version": "1.0.0"
 }
