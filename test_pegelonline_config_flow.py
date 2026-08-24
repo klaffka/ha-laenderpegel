@@ -107,6 +107,35 @@ async def test_single_station_wasser_skips_station_step(hass: HomeAssistant) -> 
         assert result["result"].data["station_uuid"] == "uuid-koblenz"
 
 
+async def test_station_without_w_ts_aborts(hass: HomeAssistant) -> None:
+    details_without_w = {
+        "uuid": "uuid-trier-up",
+        "longname": "TRIER UP",
+        "timeseries": [{"shortname": "Q", "unit": "m³/s"}],
+    }
+    with (
+        patch(
+            "custom_components.pegelonline.api.async_get_stations",
+            return_value=STATIONS,
+        ),
+        patch(
+            "custom_components.pegelonline.api.async_get_station",
+            return_value=details_without_w,
+        ),
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": "user"}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"wasser": "MOSEL"}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"station": "uuid-trier-up"}
+        )
+        assert result["type"] is FlowResultType.ABORT
+        assert result["reason"] == "no_data"
+
+
 async def test_duplicate_station_aborts(hass: HomeAssistant) -> None:
     existing = MockConfigEntry(
         domain=DOMAIN,

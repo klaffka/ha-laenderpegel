@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
 import aiohttp
@@ -25,9 +26,13 @@ async def _start_flow(hass: HomeAssistant) -> dict:
     )
 
 
+SERIE = [(datetime(2026, 8, 24, 7, 0), 15.0)]
+
+
 async def test_full_flow(hass: HomeAssistant) -> None:
     with (
         patch.object(mv.Provider, "async_get_stations", new=AsyncMock(return_value=STATIONEN)),
+        patch.object(mv.Provider, "async_get_series", new=AsyncMock(return_value=SERIE)),
         patch.object(mv.Provider, "async_get_gauge_zero", new=AsyncMock(return_value=0.0)),
     ):
         result = await _start_flow(hass)
@@ -56,6 +61,7 @@ async def test_full_flow(hass: HomeAssistant) -> None:
 async def test_single_station_wasser_skips_station_step(hass: HomeAssistant) -> None:
     with (
         patch.object(mv.Provider, "async_get_stations", new=AsyncMock(return_value=STATIONEN)),
+        patch.object(mv.Provider, "async_get_series", new=AsyncMock(return_value=SERIE)),
         patch.object(mv.Provider, "async_get_gauge_zero", new=AsyncMock(return_value=None)),
     ):
         result = await _start_flow(hass)
@@ -100,3 +106,19 @@ async def test_provider_not_reachable_shows_error(hass: HomeAssistant) -> None:
         assert result["type"] is FlowResultType.FORM
         assert result["step_id"] == "user"
         assert result["errors"] == {"base": "cannot_connect"}
+
+
+async def test_station_without_data_aborts(hass: HomeAssistant) -> None:
+    with (
+        patch.object(mv.Provider, "async_get_stations", new=AsyncMock(return_value=STATIONEN)),
+        patch.object(mv.Provider, "async_get_series", new=AsyncMock(return_value=[])),
+    ):
+        result = await _start_flow(hass)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"wasser": "Warnow"}
+        )
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"station": "04416.1"}
+        )
+        assert result["type"] is FlowResultType.ABORT
+        assert result["reason"] == "no_data"

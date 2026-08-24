@@ -93,9 +93,16 @@ class LaenderpegelConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 and entry.data.get(CONF_STATION_ID) == station.id
             ):
                 return self.async_abort(reason="already_configured")
+        session = aiohttp_client.async_get_clientsession(self.hass)
+        try:
+            punkte = await self._provider.async_get_series(session, station.id)
+        except aiohttp.ClientError:
+            _LOGGER.warning("Could not fetch data for %s:%s", self._provider.code, station.id, exc_info=True)
+            return self.async_abort(reason="no_data")
+        if not punkte:
+            return self.async_abort(reason="no_data")
         gauge_zero = None
         try:
-            session = aiohttp_client.async_get_clientsession(self.hass)
             gauge_zero = await self._provider.async_get_gauge_zero(session, station.id)
         except aiohttp.ClientError:
             _LOGGER.debug("Gauge zero not available for %s:%s", self._provider.code, station.id, exc_info=True)
@@ -139,13 +146,18 @@ class LaenderpegelConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             stationen = [s for s in self._stationen if s.wasser == user_input["wasser"]]
             if not stationen:
                 return self._async_show_form(
-                    "wasser", self._select("wasser", sorted({s.wasser for s in self._stationen})), {"base": "unknown"}
+                    "wasser",
+                    self._select("wasser", sorted({s.wasser for s in self._stationen})),
+                    {"base": "unknown"},
+                    {"bundesland": self._provider.name},
                 )
             if len(stationen) == 1:
                 return await self._async_finish(stationen[0])
             self.context["wasser"] = user_input["wasser"]
             return self._async_show_form(
-                "station", self._station_select(stationen), placeholders={"wasser": user_input["wasser"]}
+                "station",
+                self._station_select(stationen),
+                placeholders={"bundesland": self._provider.name, "wasser": user_input["wasser"]},
             )
         waesser = sorted({s.wasser for s in self._stationen})
         return self._async_show_form(
@@ -161,5 +173,7 @@ class LaenderpegelConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         waesser = self.context.get("wasser")
         stationen = [s for s in self._stationen if s.wasser == waesser]
         return self._async_show_form(
-            "station", self._station_select(stationen), placeholders={"wasser": waesser}
+            "station",
+            self._station_select(stationen),
+            placeholders={"bundesland": self._provider.name, "wasser": waesser},
         )

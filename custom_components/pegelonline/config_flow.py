@@ -80,6 +80,8 @@ class PegelonlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="cannot_connect")
         zeitreihen = details.get("timeseries", [])
         w_ts = next((ts for ts in zeitreihen if ts.get("shortname") == "W"), None)
+        if w_ts is None:
+            return self.async_abort(reason="no_data")
         wv_ts = next((ts for ts in zeitreihen if ts.get("shortname") == "WV"), None)
         gauge_zero = w_ts.get("gaugeZero") if w_ts else None
         unit_w = w_ts.get("unit", "cm") if w_ts else "cm"

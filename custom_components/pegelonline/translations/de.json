@@ -21,7 +21,8 @@
     },
     "abort": {
       "already_configured": "Diese Messstelle ist bereits konfiguriert.",
-      "cannot_connect": "Die PEGELONLINE-API ist nicht erreichbar."
+      "cannot_connect": "Die PEGELONLINE-API ist nicht erreichbar.",
+      "no_data": "Für diese Messstelle liegen derzeit keine Messdaten vor."
     }
   }
 }

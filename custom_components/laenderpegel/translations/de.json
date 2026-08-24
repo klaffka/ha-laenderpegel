@@ -28,7 +28,8 @@
       "no_stations": "Das Landes-Pegelportal lieferte keine Stationen."
     },
     "abort": {
-      "already_configured": "Diese Messstelle ist bereits konfiguriert."
+      "already_configured": "Diese Messstelle ist bereits konfiguriert.",
+      "no_data": "Für diese Messstelle liegen derzeit keine Messdaten vor."
     }
   }
 }

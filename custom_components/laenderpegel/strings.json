@@ -28,7 +28,8 @@
       "no_stations": "The state gauge portal returned no stations."
     },
     "abort": {
-      "already_configured": "This gauge station is already configured."
+      "already_configured": "This gauge station is already configured.",
+      "no_data": "This gauge station currently has no measurement data."
     }
   }
 }

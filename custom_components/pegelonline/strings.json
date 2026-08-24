@@ -21,7 +21,8 @@
     },
     "abort": {
       "already_configured": "This gauge station is already configured.",
-      "cannot_connect": "The PEGELONLINE API could not be reached."
+      "cannot_connect": "The PEGELONLINE API could not be reached.",
+      "no_data": "This gauge station currently has no measurement data."
     }
   }
 }
