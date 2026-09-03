@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from homeassistant.core import HomeAssistant
@@ -6,6 +6,7 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pegelonline.const import DOMAIN
+from custom_components.pegelonline.coordinator import summarize_forecast
 
 STATION_UUID = "a26e57c9-1cb8-4fca-ba80-9e02abc81df8"
 
@@ -29,8 +30,7 @@ CURRENT_MEASUREMENT = {
 }
 
 
-def _forecast_points() -> list[dict]:
-    now = dt_util.now()
+def _forecast_points(now: datetime) -> list[dict]:
     return [
         {
             "initialized": now.isoformat(),
@@ -43,6 +43,7 @@ def _forecast_points() -> list[dict]:
 
 
 async def test_sensor_states_with_forecast(hass: HomeAssistant) -> None:
+    now = dt_util.now()
     entry = MockConfigEntry(
         domain=DOMAIN, unique_id=STATION_UUID, data=ENTRY_DATA
     )
@@ -54,8 +55,9 @@ async def test_sensor_states_with_forecast(hass: HomeAssistant) -> None:
         ),
         patch(
             "custom_components.pegelonline.api.async_get_forecast",
-            return_value=_forecast_points(),
+            return_value=_forecast_points(now),
         ),
+        patch("custom_components.pegelonline.coordinator.dt_util.now", return_value=now),
     ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
@@ -95,3 +97,66 @@ async def test_sensor_states_without_forecast(hass: HomeAssistant) -> None:
     states = hass.states.async_all("sensor")
     assert len(states) == 1
     assert states[0].state == "63.0"
+
+
+def test_forecast_is_limited_to_next_24_hours() -> None:
+    now = datetime.fromisoformat("2026-09-03T12:00:00+02:00")
+    points = [
+        {
+            "initialized": "past-run",
+            "timestamp": (now - timedelta(minutes=1)).isoformat(),
+            "value": 999.0,
+        },
+        {
+            "initialized": "current-run",
+            "timestamp": now.isoformat(),
+            "value": 100.0,
+        },
+        {
+            "initialized": "current-run",
+            "timestamp": (now + timedelta(hours=12)).isoformat(),
+            "value": 80.0,
+        },
+        {
+            "initialized": "current-run",
+            "timestamp": (now + timedelta(hours=24)).isoformat(),
+            "value": 120.0,
+        },
+        {
+            "initialized": "future-run",
+            "timestamp": (now + timedelta(hours=24, seconds=1)).isoformat(),
+            "value": 1000.0,
+        },
+    ]
+
+    with patch("custom_components.pegelonline.coordinator.dt_util.now", return_value=now):
+        summary = summarize_forecast(points)
+
+    assert summary == {
+        "initialisiert": "current-run",
+        "ende": (now + timedelta(hours=24)).isoformat(),
+        "min_24h": 80.0,
+        "max_24h": 120.0,
+        "anzahl_punkte": 3,
+    }
+
+
+def test_forecast_without_points_in_next_24_hours() -> None:
+    now = datetime.fromisoformat("2026-09-03T12:00:00+02:00")
+    points = [
+        {
+            "initialized": "past-run",
+            "timestamp": (now - timedelta(seconds=1)).isoformat(),
+            "value": 100.0,
+        },
+        {
+            "initialized": "future-run",
+            "timestamp": (now + timedelta(hours=24, seconds=1)).isoformat(),
+            "value": 200.0,
+        },
+        {"timestamp": "invalid", "value": 300.0},
+        {"timestamp": now.isoformat(), "value": None},
+    ]
+
+    with patch("custom_components.pegelonline.coordinator.dt_util.now", return_value=now):
+        assert summarize_forecast(points) is None

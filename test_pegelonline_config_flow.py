@@ -1,5 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
+import aiohttp
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -161,3 +162,25 @@ async def test_duplicate_station_aborts(hass: HomeAssistant) -> None:
         )
         assert result["type"] is FlowResultType.ABORT
         assert result["reason"] == "already_configured"
+
+
+async def test_api_failure_keeps_user_form_available(hass: HomeAssistant) -> None:
+    get_stations = AsyncMock(side_effect=aiohttp.ClientError("down"))
+    with patch(
+        "custom_components.pegelonline.api.async_get_stations",
+        new=get_stations,
+    ):
+        result = await hass.config_entries.flow.async_init(
+            DOMAIN, context={"source": "user"}
+        )
+        assert result["type"] is FlowResultType.FORM
+        assert result["step_id"] == "user"
+        assert result["errors"] == {"base": "cannot_connect"}
+
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], user_input={"wasser": "MOSEL"}
+        )
+        assert result["type"] is FlowResultType.FORM
+        assert result["step_id"] == "user"
+        assert result["errors"] == {"base": "cannot_connect"}
+        assert get_stations.await_count == 2

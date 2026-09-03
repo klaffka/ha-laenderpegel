@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import aiohttp
@@ -29,17 +29,22 @@ type PegelonlineData = dict[str, Any]
 def summarize_forecast(points: list[dict]) -> dict[str, Any] | None:
     now = dt_util.now()
     horizon = now + timedelta(hours=FORECAST_HORIZON_HOURS)
-    punkte = [
-        punkt
-        for punkt in points
-        if dt_util.parse_datetime(punkt["timestamp"]) <= horizon
-    ]
+    punkte: list[tuple[datetime, dict]] = []
+    for punkt in points:
+        timestamp_raw = punkt.get("timestamp")
+        value = punkt.get("value")
+        if not isinstance(timestamp_raw, str) or not isinstance(value, (int, float)):
+            continue
+        timestamp = dt_util.parse_datetime(timestamp_raw)
+        if timestamp is not None and timestamp.tzinfo and now <= timestamp <= horizon:
+            punkte.append((timestamp, punkt))
     if not punkte:
         return None
-    werte = [punkt["value"] for punkt in punkte]
+    punkte.sort(key=lambda item: item[0])
+    werte = [punkt["value"] for _, punkt in punkte]
     return {
-        "initialisiert": punkte[0].get("initialized"),
-        "ende": max(punkt["timestamp"] for punkt in points),
+        "initialisiert": punkte[0][1].get("initialized"),
+        "ende": punkte[-1][1]["timestamp"],
         "min_24h": min(werte),
         "max_24h": max(werte),
         "anzahl_punkte": len(punkte),

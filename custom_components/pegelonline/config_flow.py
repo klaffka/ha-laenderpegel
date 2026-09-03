@@ -55,15 +55,20 @@ class PegelonlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return True
 
     def _async_show_user_form(self, errors: dict[str, str]) -> FlowResult:
-        waesser = sorted({s["water"]["longname"] for s in self._stations})
+        waesser = sorted(
+            {s["water"]["longname"] for s in (self._stations or [])}
+        )
+        wasser_selector: Any = str
+        if waesser:
+            wasser_selector = SelectSelector(
+                SelectSelectorConfig(
+                    options=[{"value": w, "label": w} for w in waesser],
+                    mode=SelectSelectorMode.DROPDOWN,
+                )
+            )
         schema = vol.Schema(
             {
-                vol.Required("wasser"): SelectSelector(
-                        SelectSelectorConfig(
-                        options=[{"value": w, "label": w} for w in waesser],
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                )
+                vol.Required("wasser"): wasser_selector,
             }
         )
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)

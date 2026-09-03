@@ -49,9 +49,10 @@ administrations (WSV).
 
 Each station creates:
 
-- `sensor.<station>_wasserstand` – current water level with unit, timestamp, 24 h min/max and,
-  if published, the gauge zero point
-- `sensor.<station>_vorhersage` – forecast value (optional, enabled in the setup form)
+- `sensor.<station>_wasserstand` – current water level with unit, timestamp and, if published,
+  the gauge zero point
+- `sensor.<station>_vorhersage` – forecast value with the 24 h minimum and maximum; created
+  automatically when the station publishes a `WV` time series
 
 Configuration: *Settings → Devices & Services → Add Integration* → **PEGELONLINE**, then search
 for the station by name or number.
